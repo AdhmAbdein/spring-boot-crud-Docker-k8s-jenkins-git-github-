@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: spring-crud-deploy
+  labels:
+    crud: spring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      crud: spring
+  template:
+    metadata:
+      name: pod-crud
+      labels:
+        crud: spring
+    spec:
+      containers:
+        - name: cont-crud
+          image: adhmabdein/crud
+          ports:
+            - containerPort: 8080
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: "jdbc:mysql://crudsvc:3306/crud_db?useSSL=false&serverTimezone=UTC&useLegacyDatetimeCode=false"
+            - name: SPRING_DATASOURCE_USERNAME
+              value: "root"
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-crud-secret
+                  key: MYSQL_PASSWORD    

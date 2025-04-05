@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-crud-deploy
+  labels:
+    crud: mysql
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      crud: mysql
+  template:
+    metadata:
+      labels:
+        crud: mysql
+    spec:
+      containers:
+        - name: cont-crud
+          image: mysql:8.0
+          ports:
+            - containerPort: 3306
+          env:
+            - name: MYSQL_DATABASE
+              value: "crud_db"
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-crud-secret
+                  key: MYSQL_PASSWORD
+          volumeMounts:
+            - name: crud-vol
+              mountPath: /data
+      volumes:
+        - name: crud-vol
+          persistentVolumeClaim:
+            claimName: mysql-crud-pvc
+
+
+        
